@@ -166,15 +166,15 @@ class order
 				$cols =explode('||', $item);
 
 				$data[$cols[0]] = [
-					'id' => $cols[1],
-					'date' => $cols[2],
-					'username' => $cols[3],
-					'lastname' => $cols[4],
-					'email'=> $cols[5],
-					'phone'=>$cols[6],
-					'conf' => $this->getConfies()[$cols[7]],
-					'pay' => $this->getPayment()[$cols[8]],
-					// 'message' => $cols[9],
+					'id' => $cols[0],
+					'date' => $cols[1],
+					'username' => $cols[2],
+					'lastname' => $cols[3],
+					'email'=> $cols[4],
+					'phone'=>$cols[5],
+					'conf' => $this->getConfies()[$cols[6]],
+					'pay' => $this->getPayment()[$cols[7]],
+					'message' => $cols[8],
 					'post' => $cols[9],
 				];
 			}
