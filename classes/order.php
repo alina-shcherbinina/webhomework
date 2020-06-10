@@ -38,7 +38,7 @@ class order
 			$errors['username'] = 'Username must be at least 3 symbols or more';
 		else if (strlen($this->username) > 100)
 			$errors['username'] = 'username must be less than 100 characters';
-		else if (!preg_match("/^[А-Яё][а-яё]+?$/", $this->username))
+		else if (!preg_match("/^[А-Яё][а-яё]+?$/u", $this->username))
 			$errors['username'] = 'username must begin with capital letter; username must be in russian';
 
 
@@ -48,7 +48,7 @@ class order
 			$errors['lastname'] = 'lastname must be at least 3 symbols or more';
 		else if (strlen($this->lastname) > 100)
 			$errors['lastname'] = 'lastname must be less than 100 characters';
-		else if (!preg_match('/^[А-Яё][а-яё]+?$/', subject))
+		else if (!preg_match('/^[А-Яё][а-яё]+?$/u', $this->lastname))
 			$errors['lastname'] = 'lastname must begin with a capital letter; lastname must be in russian';
 
 		if (empty($this->email))
