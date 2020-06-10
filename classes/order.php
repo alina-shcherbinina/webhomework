@@ -1,0 +1,184 @@
+<?php
+namespace classes;
+
+class order
+{
+	public $username;
+	public $lastname;
+	public $email;
+	public $phone;
+	public $conf;
+	public $pay;
+	public $message;
+	public $agree;
+
+	protected static $confies = [
+		1 => 'Бизнес',
+		2 => 'Технологии',
+		3 => 'Реклама и Маркетинг',
+	];
+
+	protected static $payment = [
+		1 => 'WebMoney',
+		2 => 'Яндекс.Деньги',
+		3 => 'PayPal',
+		4 => 'кредитная карта',
+	];
+
+	protected $errors;
+	protected $id;
+	protected $date;
+
+	public function validate(){
+		$errors=[];
+
+		if (empty($this->username))
+			$errors['username'] = 'Username is required!';
+		else if (strlen($this->username) < 3)
+			$errors['username'] = 'Username must be at least 3 symbols or more';
+		else if (strlen($this->username) > 100)
+			$errors['username'] = 'username must be less than 100 characters';
+
+
+		if (empty($this->lastname))
+			$errors['lastname'] = 'lastname is required!';
+		else if (strlen($this->lastname) < 3)
+			$errors['lastname'] = 'lastname must be at least 3 symbols or more';
+		else if (strlen($this->lastname) > 100)
+			$errors['lastname'] = 'lastname must be less than 100 characters';
+
+		if (empty($this->email))
+			$errors['email'] = 'email is required!';
+		else if (strlen($this->email) < 3)
+			$errors['email'] = 'email must be at least 3 symbols or more';
+		else if (strlen($this->email) > 100)
+			$errors['email'] = 'email must be less than 100 characters';
+
+		$alphas = array_merge(range('A', 'Z'), range('a', 'z'));
+		if (empty($this->phone))
+			$errors['phone'] = 'phone is required!';
+		else if (strlen($this->phone) == $alphas)
+			$errors['phone'] = 'phone must have only numbers in it';
+		else if (strlen($this->phone) > 100)
+			$errors['phone'] = 'phone must be less than 100 characters';
+
+
+
+		if (empty($this->conf))
+		{
+			$errors['conf'] = 'conf is required!';
+		} 
+
+		if (empty($this->pay))
+		{
+			$errors['pay'] = 'pay is required!';
+		} 
+
+
+		if (empty($this->message))
+		{
+			$errors['message'] = 'message is required!';
+		}
+		else if (strlen($this->message) < 3)
+		{
+			$errors['message'] = 'message must be at least 3 symbols or more';
+		}
+		else if (strlen($this->message) > 100)
+		{
+			$errors['message'] = 'message must be less than 100 characters';
+		}
+
+
+		if (empty($this->agree))
+		{
+			$errors['agree'] = 'you must agree with the policy!';
+		}
+
+		$this->errors = $errors;
+
+		return !$this->errors;
+	}
+
+	public function getErrors()
+	{
+		return $this->errors;
+	}
+
+	public function getConfies()
+	{
+		return static::$confies;
+	} 
+
+	public function getPayment()
+	{
+		return static::$payment;
+	}
+	public function fill($data)
+	{
+		$this->username = trim(strip_tags(array_get($data,'username')));
+		$this->lastname = trim(strip_tags(array_get($data,'lastname')));
+		$this->email = trim(strip_tags(array_get($data,'email')));
+		$this->phone = trim(strip_tags(array_get($data,'phone')));
+		$this->conf = trim(strip_tags(array_get($data,'conf')));
+		$this->pay = trim(strip_tags(array_get($data,'pay')));
+		$this->message = trim(strip_tags(array_get($data,'message')));
+		$this->post = trim(strip_tags(array_get($data,'post')));
+		$this->agree = trim(strip_tags(array_get($data,'agree')));
+	}
+
+	public function save()
+	{
+
+		$content = [];
+		$content[] = uniqid();
+		$content[] = date('Y-m-d H:i:s');
+		$content[] = $this->username;
+		$content[] = $this->lastname;
+		$content[] = $this->email;
+		$content[]=$this->phone;
+		$content[]=$this->conf;
+		$content[]=$this->pay;
+		$content[] = str_replace(PHP_EOL, ' ', $this->message);
+		$content[]= $this->post;
+
+		$filename= 'data.txt';
+
+		$content = implode('||', $content) . "\n\r";
+
+		file_put_contents($filename, $content, FILE_APPEND);
+
+      // $successMessage = 'Thank you the data has been saved!';
+		return true;
+	}
+
+	public function getData($file)
+	{
+			$contents = file_get_contents('data.txt');
+			$contents=trim($contents);
+
+			$items=explode("\n", $contents);
+
+			$data=[];
+
+			foreach ($items as $item) {
+
+				$item= trim($item);
+				$cols =explode('||', $item);
+
+				$data[$cols[0]] = [
+					'id' => $cols[1],
+					'date' => $cols[2],
+					'username' => $cols[3],
+					'lastname' => $cols[4],
+					'email'=> $cols[5],
+					'phone'=>$cols[6],
+					'conf' => $this->getConfies()[$cols[7]],
+					'pay' => $this->getPayment()[$cols[8]],
+					// 'message' => $cols[9],
+					'post' => $cols[9],
+				];
+			}
+			return $data;
+
+	}
+}
