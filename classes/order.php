@@ -38,6 +38,8 @@ class order
 			$errors['username'] = 'Username must be at least 3 symbols or more';
 		else if (strlen($this->username) > 100)
 			$errors['username'] = 'username must be less than 100 characters';
+		else if (!preg_match("/^[А-Яё][а-яё]+?$/u", $this->username))
+			$errors['username'] = 'username must begin with capital letter; username must be in russian';
 
 
 		if (empty($this->lastname))
@@ -46,6 +48,8 @@ class order
 			$errors['lastname'] = 'lastname must be at least 3 symbols or more';
 		else if (strlen($this->lastname) > 100)
 			$errors['lastname'] = 'lastname must be less than 100 characters';
+		else if (!preg_match('/^[А-Яё][а-яё]+?$/u', $this->lastname))
+			$errors['lastname'] = 'lastname must begin with a capital letter; lastname must be in russian';
 
 		if (empty($this->email))
 			$errors['email'] = 'email is required!';
@@ -53,15 +57,14 @@ class order
 			$errors['email'] = 'email must be at least 3 symbols or more';
 		else if (strlen($this->email) > 100)
 			$errors['email'] = 'email must be less than 100 characters';
+		else if (!preg_match('/^[a-zA-Z0-9]+\@[a-zA-Z]{2,63}\.[a-zA-Z]{2,}$/', $this->email))
+			$errors['email'] = 'email must be entered properly';
 
-		$alphas = array_merge(range('A', 'Z'), range('a', 'z'));
+
 		if (empty($this->phone))
 			$errors['phone'] = 'phone is required!';
-		else if (strlen($this->phone) == $alphas)
-			$errors['phone'] = 'phone must have only numbers in it';
-		else if (strlen($this->phone) > 100)
-			$errors['phone'] = 'phone must be less than 100 characters';
-
+		else if (!preg_match('/^\+7\s?\d{3}\s?\d{3}\-?\d{2}\-?\d{2}$/', $this->phone))
+			$errors['phone'] = 'phone is not matching the needed pattern!';
 
 
 		if (empty($this->conf))
