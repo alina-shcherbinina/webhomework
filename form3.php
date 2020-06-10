@@ -5,6 +5,10 @@ use classes\order;
 
 $order = new order;
 
+if (isset($_SESSION['successMessage'])) {
+	$successMessage = $_SESSION['successMessage'];
+}
+
 if ($_POST) {
 	$order->fill($_POST);
 
@@ -12,7 +16,9 @@ if ($_POST) {
 	{ 
 		if ($order->save())
 		{
-			$successMessage = 'Thank you the data has been saved!';
+			$_SESSION['successMessage'] = 'Thank you the data has been saved!';
+			header('Location: /form3.php');
+			exit;
 		}
 	}
 	else 
