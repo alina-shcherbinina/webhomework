@@ -95,7 +95,7 @@
              <option value="<?= $payID ?>" <?= !empty($_POST['pay']) && $_POST['pay'] == $payID ? ' selected' : '' ?>><?= $payName ?></option>
             <?php endforeach ?> 
           </select>
-          <span class="error"><?= $errors['pay']) ?? '' ?> </span>
+          <span class="error"><?= $errors['pay'] ?? '' ?> </span>
         </div>
 
 
