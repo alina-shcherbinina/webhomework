@@ -40,7 +40,4 @@ $order= new order;
 
 $data= $order->getData('data.txt');
 
-include 'template/admin.php';
-
-
-}
+include 'templates/admin.php';
