@@ -18,7 +18,7 @@ if ($_POST) {
 		if ($order->save())
 		{
 			$_SESSION['successMessage'] = 'Thank you the data has been saved!';
-			header('Location: /form3.php');
+			header('Location: /web13/form3.php');
 			exit;
 		}
 	}
