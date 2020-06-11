@@ -1,6 +1,8 @@
 <?php
 namespace classes;
 
+use PDO;
+
 class order
 {
 	public $username;
@@ -11,7 +13,9 @@ class order
 	public $pay;
 	public $message;
 	public $agree;
-
+	public $id;
+	public $date;
+  
 	protected static $confies = [
 		1 => 'Бизнес',
 		2 => 'Технологии',
@@ -26,8 +30,7 @@ class order
 	];
 
 	protected $errors;
-	protected $id;
-	protected $date;
+	
 
 	public function validate(){
 		$errors=[];
@@ -38,6 +41,8 @@ class order
 			$errors['username'] = 'Username must be at least 3 symbols or more';
 		else if (strlen($this->username) > 100)
 			$errors['username'] = 'username must be less than 100 characters';
+		else if (!preg_match("/^[А-Яё][а-яё]+?$/u", $this->username))
+			$errors['username'] = 'username must begin with capital letter; username must be in russian';
 
 
 		if (empty($this->lastname))
@@ -46,6 +51,8 @@ class order
 			$errors['lastname'] = 'lastname must be at least 3 symbols or more';
 		else if (strlen($this->lastname) > 100)
 			$errors['lastname'] = 'lastname must be less than 100 characters';
+		else if (!preg_match('/^[А-Яё][а-яё]+?$/u', $this->lastname))
+			$errors['lastname'] = 'lastname must begin with a capital letter; lastname must be in russian';
 
 		if (empty($this->email))
 			$errors['email'] = 'email is required!';
@@ -53,15 +60,14 @@ class order
 			$errors['email'] = 'email must be at least 3 symbols or more';
 		else if (strlen($this->email) > 100)
 			$errors['email'] = 'email must be less than 100 characters';
+		else if (!preg_match('/^[a-zA-Z0-9]+\@[a-zA-Z]{2,63}\.[a-zA-Z]{2,}$/', $this->email))
+			$errors['email'] = 'email must be entered properly';
 
-		$alphas = array_merge(range('A', 'Z'), range('a', 'z'));
+
 		if (empty($this->phone))
 			$errors['phone'] = 'phone is required!';
-		else if (strlen($this->phone) == $alphas)
-			$errors['phone'] = 'phone must have only numbers in it';
-		else if (strlen($this->phone) > 100)
-			$errors['phone'] = 'phone must be less than 100 characters';
-
+		else if (!preg_match('/^\+7\s?\d{3}\s?\d{3}\-?\d{2}\-?\d{2}$/', $this->phone))
+			$errors['phone'] = 'phone is not matching the needed pattern!';
 
 
 		if (empty($this->conf))
@@ -126,31 +132,51 @@ class order
 		$this->agree = trim(strip_tags(array_get($data,'agree')));
 	}
 
+	
+
 	public function save()
 	{
+		
+		$db = database::getConnection();
+		$sql = $db->prepare('insert into `participants`(`date`, `username`, `lastname`, `email`, `phone`, `conf`, `pay`, `message`, `post` ) values (:date, :username, :lastname, :email, :phone, :conf, :pay, :message, :post)');
 
-		$content = [];
-		$content[] = uniqid();
-		$content[] = date('Y-m-d H:i:s');
-		$content[] = $this->username;
-		$content[] = $this->lastname;
-		$content[] = $this->email;
-		$content[]=$this->phone;
-		$content[]=$this->conf;
-		$content[]=$this->pay;
-		$content[] = str_replace(PHP_EOL, ' ', $this->message);
-		$content[]= $this->post;
+		$sql -> execute([
+			':date'=>date('Y-m-d H:i:s'), 
+			':username'=>$this->username,
+			':lastname' =>  $this->lastname,
+			':email'=> $this->email, 
+			':phone'=>preg_replace('/^\+7\s?(\d{3})\s?(\d{3})\-?(\d{2})\-?(\d{2})$/', '+7 $1 $2-$3-$4',$this->phone),
+			':conf'=>$this->conf,
+			':pay'=>$this->pay,
+			':message'=>$this->message,
+			':post'=>$this->post,
+		]);
 
-		$filename= 'data.txt';
-
-		$content = implode('||', $content) . "\n\r";
-
-		file_put_contents($filename, $content, FILE_APPEND);
-
-      // $successMessage = 'Thank you the data has been saved!';
-		return true;
+		return $sql->rowCount() === 1;
 	}
 
+	public static function loadAll()
+	{
+		$db=database::getConnection();
+
+		$sql = $db->prepare('SELECT `id`, `date`, `username`, `lastname`, `email`, `phone`, `conf`, `pay`, `message`, `post` from `participants`');
+
+		$sql->execute();
+
+		$participants = $sql ->fetchAll(PDO::FETCH_CLASS, static::class);
+		return $participants;
+
+	}
+	 public static function delete($id)
+    {
+        $db=database::getConnection();
+
+        $time = date('Y-m-d H:i:s');
+        $sql = $db->prepare("UPDATE `participants` SET `deleted_at` = '$time' WHERE `id` = :id LIMIT 1 ");
+
+        $sql->execute([':id' => $id]);
+        return true;
+    }
 	public function getData($file)
 	{
 			$contents = file_get_contents('data.txt');
@@ -179,6 +205,5 @@ class order
 				];
 			}
 			return $data;
-
 	}
 }
