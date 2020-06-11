@@ -15,5 +15,4 @@ if ($_POST)
 }
 
 $data=order::loadAll();
-var_dump($data);
 include 'templates/admin.php';
