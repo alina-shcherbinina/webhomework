@@ -42,21 +42,21 @@ th {
 				<th>recieve mail</th>
 			</thead>
 			<tbody>
-				<?php foreach ($data as $id => $item): ?>
+				<?php foreach ($data as $id => $item) : ?>
 				<tr>
 				<td>
-					<input type="checkbox" name="selected_ids[]" value="<?= $id ?>"> 
-					<strong><?= $id ?></strong>
+							<input type="checkbox" name="selected_ids[]" value="<?= $item->id ?>">
+                            <strong> <?= $item->id ?> </strong>
 				</td>
-				<td><?= $item['date']?></td>
-				<td><?= $item['username']?></td>
-				<td><?= $item['lastname']?></td>
-				<td><?= $item['email']?></td>
-				<td><?= $item['phone']?></td>
-				<td><?= $item['conf']?></td>
-				<td><?= $item['pay']?></td>
-				<td><?= $item['message']?></td>
-				<td><?= $item['post']?></td>
+          <td><?= $item->date?></td>
+				<td><?= $item->username?></td>
+				<td><?= $item->lastname?></td>
+				<td><?= $item->email?></td>
+				<td><?= $item->phone?></td>
+				<td><?= $item->conf?></td>
+				<td><?= $item->pay?></td>
+				<td><?= $item->message?></td>
+				<td><?= $item->post?></td>
 				</tr>
 				<?php endforeach ?>	
 			</tbody>
